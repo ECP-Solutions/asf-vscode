@@ -1,0 +1,43 @@
+{
+  "name": "asf-language",
+  "displayName": "ASF Language Support",
+  "description": "Advanced Scripting Framework language support for VS Code",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.109.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "asf",
+      "aliases": ["ASF", "asf"],
+      "extensions": [".vas"],
+      "configuration": "./language-configuration.json",
+      "icon": {
+          "light": "./icons/asf-icon.png",
+          "dark": "./icons/asf-icon.png"
+        }
+    }],
+    "grammars": [{
+      "language": "asf",
+      "scopeName": "source.asf",
+      "path": "./syntaxes/asf.tmLanguage.json"
+    }],
+    "snippets": [
+      {
+        "language": "asf",
+        "path": "./snippets/asf.json"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ECP-Solutions/asf-vscode"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.109.0"
+  }
+}
+

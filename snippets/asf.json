@@ -1,0 +1,211 @@
+{
+  "Function Declaration": {
+    "prefix": "fun",
+    "body": [
+      "fun ${1:name}(${2:params}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Function declaration"
+  },
+  "Class Declaration": {
+    "prefix": "class",
+    "body": [
+      "class ${1:ClassName} {",
+      "\tconstructor(${2:params}) {",
+      "\t\t$0",
+      "\t}",
+      "}"
+    ],
+    "description": "Class declaration"
+  },
+  "Class with Extends": {
+    "prefix": "classx",
+    "body": [
+      "class ${1:ClassName} extends ${2:ParentClass} {",
+      "\tconstructor(${3:params}) {",
+      "\t\tsuper(${4:args});",
+      "\t\t$0",
+      "\t}",
+      "}"
+    ],
+    "description": "Class declaration with extends"
+  },
+  "If Statement": {
+    "prefix": "if",
+    "body": [
+      "if (${1:condition}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "If statement"
+  },
+  "If-Else Statement": {
+    "prefix": "ife",
+    "body": [
+      "if (${1:condition}) {",
+      "\t$2",
+      "} else {",
+      "\t$0",
+      "}"
+    ],
+    "description": "If-else statement"
+  },
+  "If-ElseIf-Else Statement": {
+    "prefix": "ifel",
+    "body": [
+      "if (${1:condition}) {",
+      "\t$2",
+      "} elseif (${3:condition}) {",
+      "\t$4",
+      "} else {",
+      "\t$0",
+      "}"
+    ],
+    "description": "If-elseif-else statement"
+  },
+  "For Loop (C-style)": {
+    "prefix": "for",
+    "body": [
+      "for (${1:i = 0}, ${2:i < length}, ${3:i = i + 1}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "C-style for loop"
+  },
+  "For-In Loop": {
+    "prefix": "forin",
+    "body": [
+      "for (${1:key} in ${2:object}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "For-in loop"
+  },
+  "For-Of Loop": {
+    "prefix": "forof",
+    "body": [
+      "for (${1:item} of ${2:array}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "For-of loop"
+  },
+  "While Loop": {
+    "prefix": "while",
+    "body": [
+      "while (${1:condition}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "While loop"
+  },
+  "Switch Statement": {
+    "prefix": "switch",
+    "body": [
+      "switch (${1:expression}) {",
+      "\tcase ${2:value}:",
+      "\t\t$3",
+      "\t\tbreak;",
+      "\tdefault:",
+      "\t\t$0",
+      "}"
+    ],
+    "description": "Switch statement"
+  },
+  "Try-Catch": {
+    "prefix": "try",
+    "body": [
+      "try {",
+      "\t$1",
+      "} catch (${2:error}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Try-catch block"
+  },
+  "Import Default": {
+    "prefix": "imp",
+    "body": [
+      "import ${1:name} from \"${2:module}\";"
+    ],
+    "description": "Import default"
+  },
+  "Import Named": {
+    "prefix": "impn",
+    "body": [
+      "import { ${1:name} } from \"${2:module}\";"
+    ],
+    "description": "Import named"
+  },
+  "Import Namespace": {
+    "prefix": "impns",
+    "body": [
+      "import * as ${1:name} from \"${2:module}\";"
+    ],
+    "description": "Import namespace"
+  },
+  "Export Named": {
+    "prefix": "exp",
+    "body": [
+      "export { ${1:name} };"
+    ],
+    "description": "Export named"
+  },
+  "Export Default": {
+    "prefix": "expd",
+    "body": [
+      "export default ${1:value};"
+    ],
+    "description": "Export default"
+  },
+  "Array Destructuring": {
+    "prefix": "dest",
+    "body": [
+      "[${1:a}, ${2:b}] = ${3:array};"
+    ],
+    "description": "Array destructuring"
+  },
+  "Array Destructuring with Rest": {
+    "prefix": "destr",
+    "body": [
+      "[${1:first}, ...${2:rest}] = ${3:array};"
+    ],
+    "description": "Array destructuring with rest"
+  },
+  "Print": {
+    "prefix": "print",
+    "body": [
+      "print(${1:message});"
+    ],
+    "description": "Print statement"
+  },
+  "Let Declaration": {
+    "prefix": "let",
+    "body": [
+      "let ${1:name} = ${2:value};"
+    ],
+    "description": "Let declaration"
+  },
+  "Arrow Function": {
+    "prefix": "afun",
+    "body": [
+      "fun(${1:params}) { ${2:body} }"
+    ],
+    "description": "Anonymous function"
+  },
+  "Template Literal": {
+    "prefix": "tpl",
+    "body": [
+      "`${${1:expression}}`"
+    ],
+    "description": "Template literal"
+  },
+  "VBA Escape": {
+    "prefix": "vba",
+    "body": [
+      "@(${1:VBA_CODE})"
+    ],
+    "description": "VBA escape hatch"
+  }
+}
