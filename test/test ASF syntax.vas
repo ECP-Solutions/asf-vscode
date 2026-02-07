@@ -1,0 +1,56 @@
+// ASF Test File
+import Math from "stdlib/math";
+import { sum, multiply } from "utils";
+
+class Calculator extends BaseCalculator {
+    field result = 0;
+    # Class constructor
+    constructor(initialValue) {
+        super();
+        this.result = initialValue;
+    }
+    
+    static create() {
+        return new Calculator(0);
+    }
+    
+    add(x, y) {
+        let total = x + y;
+        this.result = total;
+        return total;
+    }
+}
+
+fun fibonacci(n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Template strings
+let name = "World";
+let greeting = `Hello, ${name}!`;
+print(greeting);
+
+// Array operations with spread
+let arr = [1, 2, 3];
+let arr2 = [...arr, 4, 5];
+
+// Destructuring
+let [first, ...rest] = arr2;
+
+// For loops
+for (i in arr) {
+    print(i);
+}
+
+for (item of arr) {
+    print(item);
+}
+
+// VBA escape
+let vbaResult = @(Range("A1").Value);
+
+export { Calculator, fibonacci };
+export default Calculator;
