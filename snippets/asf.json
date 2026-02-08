@@ -91,7 +91,7 @@
     ],
     "description": "For-of array loop"
   },
-  "For-Of Loop": {
+  "For-Of object Loop": {
     "prefix": "forof",
     "body": [
       "for (${1:item} of ${2:object}) {",
