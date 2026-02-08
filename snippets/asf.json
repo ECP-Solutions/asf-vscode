@@ -8,6 +8,16 @@
     ],
     "description": "Function declaration"
   },
+  "Object": {
+    "prefix": "obj",
+    "body": [
+      "{",
+      "\t${1:key1}: ${2:value1}",
+      "\t${3:key2}: ${4:value2}"
+      "};"
+    ],
+    "description": "Object Literal"
+  },
   "Class Declaration": {
     "prefix": "class",
     "body": [
@@ -167,7 +177,7 @@
   "Export Named": {
     "prefix": "exp",
     "body": [
-      "export { ${1:name} };"
+      "export { ${1:name}, ${2:name2} };"
     ],
     "description": "Export named"
   },

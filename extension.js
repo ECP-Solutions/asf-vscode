@@ -5,9 +5,6 @@ const vscode = require('vscode');
 // ═════════════════════════════════════════════════════════════════
 
 function activate(context) {
-    console.log('ASF Language Extension is now active');
-    vscode.window.showInformationMessage('ASF Language Extension activated ✓');
-
     // ── Diagnostic Collection ────────────────────────────────────
     const diagCollection = vscode.languages.createDiagnosticCollection('asf');
     context.subscriptions.push(diagCollection);
@@ -19,8 +16,12 @@ function activate(context) {
         }
     }
 
-    if (vscode.window.activeTextEditor) {
-        triggerValidation(vscode.window.activeTextEditor.document);
+    try {
+        if (vscode.window.activeTextEditor) {
+            triggerValidation(vscode.window.activeTextEditor.document);
+        }
+    } catch (e) {
+        // extension host not fully ready yet — ignore
     }
 
     context.subscriptions.push(
@@ -38,8 +39,9 @@ function activate(context) {
     // ── Hover Provider ───────────────────────────────────────────
     const hoverProvider = vscode.languages.registerHoverProvider('asf', {
         provideHover(document, position) {
-            const range = document.getWordRangeAtPosition(position);
-            const parts = [];
+            try {
+                const range = document.getWordRangeAtPosition(position);
+                const parts = [];
 
             // 1) Diagnostics at hover position
             const diagPart = buildDiagnosticHover(document, position, diagCollection);
@@ -67,13 +69,22 @@ function activate(context) {
             }
 
             return parts.length > 0 ? new vscode.Hover(parts) : undefined;
+            } catch (e) {
+                console.error('ASF hover error:', e);
+                return undefined;
+            }
         }
     });
 
     // ── Document Symbol Provider (Outline) ───────────────────────
     const symbolProvider = vscode.languages.registerDocumentSymbolProvider('asf', {
         provideDocumentSymbols(document) {
-            return buildOutlineSymbols(document);
+            try {
+                return buildOutlineSymbols(document);
+            } catch (e) {
+                console.error('ASF outline error:', e);
+                return [];
+            }
         }
     });
 
@@ -101,6 +112,44 @@ function activate(context) {
                 c.detail = 'Built-in object';
                 items.push(c);
             }
+            
+            // ── Snippets ──────────────────────────────────────────
+            
+            // Object literal snippet
+            const objSnippet = new vscode.CompletionItem('obj', vscode.CompletionItemKind.Snippet);
+            objSnippet.insertText = new vscode.SnippetString('{ ${1:key}: ${2:value} }');
+            objSnippet.detail = 'Object literal';
+            objSnippet.documentation = new vscode.MarkdownString('Create an object literal with key-value pairs separated by commas:\n```asf\nlet person = { name: "Alice", age: 30 };\n```');
+            items.push(objSnippet);
+            
+            // Multi-property object snippet
+            const objMultiSnippet = new vscode.CompletionItem('obj-multi', vscode.CompletionItemKind.Snippet);
+            objMultiSnippet.insertText = new vscode.SnippetString('{\n\t${1:key1}: ${2:value1},\n\t${3:key2}: ${4:value2}\n}');
+            objMultiSnippet.detail = 'Multi-property object';
+            objMultiSnippet.documentation = new vscode.MarkdownString('Create an object with multiple properties:\n```asf\nlet config = {\n\thost: "localhost",\n\tport: 8080,\n\tdebug: true\n};\n```');
+            items.push(objMultiSnippet);
+            
+            // Export list snippet
+            const exportSnippet = new vscode.CompletionItem('export-list', vscode.CompletionItemKind.Snippet);
+            exportSnippet.insertText = new vscode.SnippetString('export { ${1:name1}, ${2:name2} };');
+            exportSnippet.detail = 'Export named items';
+            exportSnippet.documentation = new vscode.MarkdownString('Export multiple named items:\n```asf\nexport { Calculator, fibonacci, PI };\n```');
+            items.push(exportSnippet);
+            
+            // Import statement snippet
+            const importSnippet = new vscode.CompletionItem('import-named', vscode.CompletionItemKind.Snippet);
+            importSnippet.insertText = new vscode.SnippetString('import { ${1:name} } from "${2:module}";');
+            importSnippet.detail = 'Import named items';
+            importSnippet.documentation = new vscode.MarkdownString('Import named exports from a module:\n```asf\nimport { sum, avg } from "utils";\n```');
+            items.push(importSnippet);
+            
+            // Array literal snippet
+            const arraySnippet = new vscode.CompletionItem('arr', vscode.CompletionItemKind.Snippet);
+            arraySnippet.insertText = new vscode.SnippetString('[${1:item1}, ${2:item2}]');
+            arraySnippet.detail = 'Array literal';
+            arraySnippet.documentation = new vscode.MarkdownString('Create an array with comma-separated elements:\n```asf\nlet numbers = [1, 2, 3, 4, 5];\n```');
+            items.push(arraySnippet);
+            
             return items;
         }
     });
@@ -208,6 +257,7 @@ function tokenize(stripped, document) {
 // ═════════════════════════════════════════════════════════════════
 
 function validateDocument(document, diagCollection) {
+    try {
     const text = document.getText();
     const stripped = stripStringsAndComments(text);
     const tokens = tokenize(stripped, document);
@@ -360,9 +410,16 @@ function validateDocument(document, diagCollection) {
                 i=expect(i,at(i-1)); return;
             }
             case 'let': {
-                i++; if(i<len) i++;
-                if (i<len && tokens[i].value==='=') { i++; i=scanExpr(i); }
-                i=expect(i,at(i-1)); return;
+                i++; // skip 'let'
+                // Walk to ';' while skipping balanced groups
+                while (i < len && tokens[i].value !== ';') {
+                    if (tokens[i].value === '(') { i = skipParens(i); continue; }
+                    if (tokens[i].value === '[') { i = skipBrackets(i); continue; }
+                    if (tokens[i].value === '{') { i = skipBraces(i); continue; }
+                    if (tokens[i].value === '}') break; // hit enclosing block end
+                    i++;
+                }
+                i = expect(i, at(i-1)); return;
             }
             case 'field': {
                 i++;
@@ -413,7 +470,85 @@ function validateDocument(document, diagCollection) {
     }
 
     parseStmts();
+    validateSeparators(tokens, diagnostics);
     diagCollection.set(document.uri, diagnostics);
+    } catch (e) {
+        console.error('ASF validation error:', e);
+        diagCollection.set(document.uri, []);
+    }
+}
+
+// ── Separator validation: semicolons not allowed inside (), [], or object {} ──
+function validateSeparators(tokens, diagnostics) {
+    const len = tokens.length;
+    const stack = []; // { type: '('|'['|'{', isBlock: bool }
+
+    for (let t = 0; t < len; t++) {
+        const tok = tokens[t];
+        const v = tok.value;
+
+        if (v === '(') {
+            stack.push({ type: '(', isBlock: false });
+        } else if (v === '[') {
+            stack.push({ type: '[', isBlock: false });
+        } else if (v === '{') {
+            // Determine block vs object literal/export list/import list.
+            // Object literal follows: = ( [ , : return ? =>
+            // Export/import list follows: export import
+            // Block follows: ) else try { } or start-of-file / statement keywords
+            const prev = t > 0 ? tokens[t - 1].value : null;
+            const isObj = (prev === '=' || prev === '(' || prev === '['
+                       || prev === ',' || prev === ':' || prev === '?'
+                       || prev === 'return' || prev === '+='
+                       || prev === '-=' || prev === '*=' || prev === '/='
+                       || prev === '%=' || prev === 'export' || prev === 'import');
+            stack.push({ type: '{', isBlock: !isObj });
+        } else if (v === ')' || v === ']' || v === '}') {
+            if (stack.length > 0) stack.pop();
+        } else if (v === ';') {
+            if (stack.length > 0) {
+                const top = stack[stack.length - 1];
+                // ';' is wrong inside parens, brackets, or object literals/export lists
+                if (top.type === '(' || top.type === '['
+                    || (top.type === '{' && !top.isBlock)) {
+                    // Check if we're in an export/import context
+                    let ctx = top.type === '(' ? 'function arguments/grouping'
+                            : top.type === '[' ? 'array elements'
+                            : 'object properties';
+                    
+                    // Look back to see if this is an export/import list
+                    if (top.type === '{') {
+                        for (let lookback = t - 1; lookback >= 0; lookback--) {
+                            const lbVal = tokens[lookback].value;
+                            if (lbVal === 'export') {
+                                ctx = 'export list';
+                                break;
+                            } else if (lbVal === 'import') {
+                                ctx = 'import list';
+                                break;
+                            } else if (lbVal === '=' || lbVal === ':' || lbVal === 'return') {
+                                ctx = 'object literal';
+                                break;
+                            }
+                        }
+                    }
+                    
+                    const range = new vscode.Range(
+                        new vscode.Position(tok.line, tok.char),
+                        new vscode.Position(tok.line, tok.char + tok.length)
+                    );
+                    const d = new vscode.Diagnostic(
+                        range,
+                        `Unexpected ';' inside ${ctx}. Use ',' to separate elements in ${ctx}.`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    d.source = 'ASF';
+                    d.code = 'unexpected-semicolon';
+                    diagnostics.push(d);
+                }
+            }
+        }
+    }
 }
 
 // ═════════════════════════════════════════════════════════════════
@@ -446,6 +581,10 @@ function buildDiagnosticHover(document, position, diagCollection) {
         if (d.code === 'missing-semicolon') {
             md += '\n\n💡 **Fix:** Add `;` after this statement. In ASF every statement must end with `;`, including block statements.\n\n';
             md += '```asf\n# ✗ Wrong\nlet x = 10\nif (x > 5) { print(x); }\n\n# ✓ Correct\nlet x = 10;\nif (x > 5) { print(x); };\n```';
+        }
+        if (d.code === 'unexpected-semicolon') {
+            md += '\n\n💡 **Fix:** Replace `;` with `,` to separate elements.\n\n';
+            md += '```asf\n# ✗ Wrong\nlet arr = [1; 2; 3];\nprint(a; b; c);\nexport { Calculator; fibonacci };\nlet obj = { x: 1; y: 2 };\n\n# ✓ Correct\nlet arr = [1, 2, 3];\nprint(a, b, c);\nexport { Calculator, fibonacci };\nlet obj = { x: 1, y: 2 };\n```';
         }
         if (i < hits.length - 1) md += '\n\n---\n\n';
     }
@@ -796,11 +935,30 @@ function buildOutlineSymbols(document) {
     const text = document.getText();
     const stripped = stripStringsAndComments(text);
     const symbols = [];
+    const docLen = text.length;
+
+    function clamp(off) {
+        return Math.max(0, Math.min(off, docLen - 1));
+    }
 
     function sym(name, detail, kind, nameOff, startOff, endOff) {
-        const full = new vscode.Range(document.positionAt(startOff), document.positionAt(endOff + 1));
-        const sel = new vscode.Range(document.positionAt(nameOff), document.positionAt(nameOff + name.length));
-        return new vscode.DocumentSymbol(name, detail, kind, full, sel);
+        try {
+            const full = new vscode.Range(
+                document.positionAt(clamp(startOff)),
+                document.positionAt(clamp(endOff + 1))
+            );
+            const sel = new vscode.Range(
+                document.positionAt(clamp(nameOff)),
+                document.positionAt(clamp(nameOff + name.length))
+            );
+            return new vscode.DocumentSymbol(name, detail, kind, full, sel);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function safePush(s) {
+        if (s) symbols.push(s);
     }
 
     // ── class ranges (to skip nested decls) ──────────────────
@@ -837,9 +995,10 @@ function buildOutlineSymbols(document) {
         const bc = matchBrace(stripped, bo);
         const nOff = clsM.index + clsM[0].indexOf(cName);
         const cSym = sym(cName, parent?`extends ${parent}`:'', vscode.SymbolKind.Class, nOff, clsM.index, bc);
+        if (!cSym) continue;
         const body = stripped.substring(bo+1, bc);
         cSym.children = parseClassMembers(body, bo+1, document);
-        symbols.push(cSym);
+        safePush(cSym);
     }
 
     // ── Top-level functions ──────────────────────────────────
@@ -859,7 +1018,7 @@ function buildOutlineSymbols(document) {
         const bef = stripped.substring(Math.max(0,fnM.index-20), fnM.index);
         const isExp = /\bexport\s*$/.test(bef);
         const detail = (isExp?'export ':'') + (params?`(${params})`:'()');
-        symbols.push(sym(fName, detail, vscode.SymbolKind.Function, nOff, isExp?fnM.index-bef.length+bef.lastIndexOf('export'):fnM.index, bc));
+        safePush(sym(fName, detail, vscode.SymbolKind.Function, nOff, isExp?fnM.index-bef.length+bef.lastIndexOf('export'):fnM.index, bc));
     }
 
     // ── Top-level let ────────────────────────────────────────
@@ -870,7 +1029,7 @@ function buildOutlineSymbols(document) {
         const vName = letM[2];
         const nOff = letM.index + letM[0].indexOf(vName);
         let end = stripped.indexOf(';', letM.index); if (end===-1) end = stripped.indexOf('\n', letM.index); if (end===-1) end = stripped.length-1;
-        symbols.push(sym(vName, 'let', vscode.SymbolKind.Variable, nOff, letM.index, end));
+        safePush(sym(vName, 'let', vscode.SymbolKind.Variable, nOff, letM.index, end));
     }
 
     // ── Imports ──────────────────────────────────────────────
@@ -883,7 +1042,7 @@ function buildOutlineSymbols(document) {
         let mod = '';
         if (fi!==-1) { const af = text.substring(fi+4).match(/\s*["']([^"']+)["']/); if (af) mod=af[1]; }
         let end = stripped.indexOf(';', impM.index); if (end===-1) end = impM.index+impM[0].length;
-        symbols.push(sym(label, mod?`from "${mod}"`:'import', vscode.SymbolKind.Module, impM.index, impM.index, end));
+        safePush(sym(label, mod?`from "${mod}"`:'import', vscode.SymbolKind.Module, impM.index, impM.index, end));
     }
 
     // ── Named exports ────────────────────────────────────────
@@ -892,7 +1051,7 @@ function buildOutlineSymbols(document) {
     while ((expM = expRe.exec(stripped)) !== null) {
         const names = expM[2].replace(/\s+as\s+\w+/g,'').trim();
         let end = stripped.indexOf(';', expM.index); if (end===-1) end = expM.index+expM[0].length;
-        symbols.push(sym(`export { ${names} }`, '', vscode.SymbolKind.Namespace, expM.index, expM.index, end));
+        safePush(sym(`export { ${names} }`, '', vscode.SymbolKind.Namespace, expM.index, expM.index, end));
     }
 
     symbols.sort((a,b) => a.range.start.compareTo(b.range.start));
@@ -901,21 +1060,41 @@ function buildOutlineSymbols(document) {
 
 function parseClassMembers(body, bodyOffset, document) {
     const members = [];
+    const docLen = document.getText().length;
+
+    function clamp(off) {
+        return Math.max(0, Math.min(off, docLen - 1));
+    }
 
     function sym(name, detail, kind, nameOff, startOff, endOff) {
-        const full = new vscode.Range(document.positionAt(startOff), document.positionAt(endOff + 1));
-        const sel = new vscode.Range(document.positionAt(nameOff), document.positionAt(nameOff + name.length));
-        return new vscode.DocumentSymbol(name, detail, kind, full, sel);
+        try {
+            const full = new vscode.Range(
+                document.positionAt(clamp(startOff)),
+                document.positionAt(clamp(endOff + 1))
+            );
+            const sel = new vscode.Range(
+                document.positionAt(clamp(nameOff)),
+                document.positionAt(clamp(nameOff + name.length))
+            );
+            return new vscode.DocumentSymbol(name, detail, kind, full, sel);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function safePush(s) {
+        if (s) members.push(s);
     }
 
     // fields
     const fre = /\bfield\s+((?:[a-zA-Z_][a-zA-Z0-9_]*(?:\s*=\s*[^,;]*)?(?:\s*,\s*)?)+)\s*;/g;
     let fm;
     while ((fm = fre.exec(body)) !== null) {
-        const nre = /([a-zA-Z_][a-zA-Z0-9_]*)/g; let nm;
+        const nre = /([a-zA-Z_][a-zA-Z0-9_]*)/g;
+        let nm;
         while ((nm = nre.exec(fm[1])) !== null) {
             const nOff = bodyOffset + fm.index + fm[0].indexOf(fm[1]) + nm.index;
-            members.push(sym(nm[1], 'field', vscode.SymbolKind.Field, nOff, bodyOffset+fm.index, bodyOffset+fm.index+fm[0].length-1));
+            safePush(sym(nm[1], 'field', vscode.SymbolKind.Field, nOff, bodyOffset + fm.index, bodyOffset + fm.index + fm[0].length - 1));
         }
     }
 
@@ -923,12 +1102,16 @@ function parseClassMembers(body, bodyOffset, document) {
     const cre = /\b(constructor)\s*\(/g;
     let cm;
     while ((cm = cre.exec(body)) !== null) {
-        const po = body.indexOf('(', cm.index+11);
+        const po = body.indexOf('(', cm.index + cm[1].length);
+        if (po === -1) continue;
         const pc = matchParen(body, po);
-        const bi = body.indexOf('{', pc); if (bi===-1) continue;
+        if (pc >= body.length) continue;
+        const bi = body.indexOf('{', pc + 1);
+        if (bi === -1) continue;
         const bc = matchBrace(body, bi);
-        const params = body.substring(po+1, pc).trim();
-        members.push(sym('constructor', params?`(${params})`:'()', vscode.SymbolKind.Constructor, bodyOffset+cm.index, bodyOffset+cm.index, bodyOffset+bc));
+        if (bc >= body.length) continue;
+        const params = body.substring(po + 1, pc).trim();
+        safePush(sym('constructor', params ? `(${params})` : '()', vscode.SymbolKind.Constructor, bodyOffset + cm.index, bodyOffset + cm.index, bodyOffset + bc));
     }
 
     // static methods
@@ -936,34 +1119,42 @@ function parseClassMembers(body, bodyOffset, document) {
     let sm;
     while ((sm = sre.exec(body)) !== null) {
         const mName = sm[2];
-        const po = body.indexOf('(', sm.index+sm[0].length-1);
+        const po = body.indexOf('(', sm.index + sm[0].length - 1);
+        if (po === -1) continue;
         const pc = matchParen(body, po);
-        const bi = body.indexOf('{', pc); if (bi===-1) continue;
+        if (pc >= body.length) continue;
+        const bi = body.indexOf('{', pc + 1);
+        if (bi === -1) continue;
         const bc = matchBrace(body, bi);
-        const params = body.substring(po+1, pc).trim();
+        if (bc >= body.length) continue;
+        const params = body.substring(po + 1, pc).trim();
         const nOff = bodyOffset + sm.index + sm[0].indexOf(mName);
-        members.push(sym(mName, `static (${params})`, vscode.SymbolKind.Method, nOff, bodyOffset+sm.index, bodyOffset+bc));
+        safePush(sym(mName, `static (${params})`, vscode.SymbolKind.Method, nOff, bodyOffset + sm.index, bodyOffset + bc));
     }
 
     // regular methods
     const mre = /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([^)]*)\)\s*\{/g;
     let mm;
     while ((mm = mre.exec(body)) !== null) {
-        if (mm[1]==='constructor' || RESERVED.has(mm[1])) continue;
-        const before = body.substring(Math.max(0,mm.index-20), mm.index);
+        if (mm[1] === 'constructor' || RESERVED.has(mm[1])) continue;
+        const before = body.substring(Math.max(0, mm.index - 20), mm.index);
         if (/\bstatic\s*$/.test(before)) continue;
-        const po = body.indexOf('(', mm.index+mm[1].length);
+        const po = body.indexOf('(', mm.index + mm[1].length);
+        if (po === -1) continue;
         const pc = matchParen(body, po);
-        const ns = body.substring(pc+1).search(/\S/);
-        if (ns===-1) continue;
-        const bi = pc+1+ns; if (body[bi]!=='{') continue;
+        if (pc >= body.length) continue;
+        const ns = body.substring(pc + 1).search(/\S/);
+        if (ns === -1) continue;
+        const bi = pc + 1 + ns;
+        if (body[bi] !== '{') continue;
         const bc = matchBrace(body, bi);
+        if (bc >= body.length) continue;
         const params = mm[2].trim();
         const nOff = bodyOffset + mm.index;
-        members.push(sym(mm[1], params?`(${params})`:'()', vscode.SymbolKind.Method, nOff, nOff, bodyOffset+bc));
+        safePush(sym(mm[1], params ? `(${params})` : '()', vscode.SymbolKind.Method, nOff, nOff, bodyOffset + bc));
     }
 
-    members.sort((a,b) => a.range.start.compareTo(b.range.start));
+    members.sort((a, b) => a.range.start.compareTo(b.range.start));
     return members;
 }
 
