@@ -94,20 +94,6 @@ This extension does not currently contribute any configurable settings.
 - **Template string nesting** — Nested template literals (backticks inside `${}` interpolations) may not highlight correctly beyond two levels of depth.
 - **No semantic tokenization yet** — Highlighting is purely TextMate-based. Variable scoping, type inference, and cross-file symbol resolution are not yet supported.
 
-## Release Notes
-
-### 1.0.0
-
-Initial release of ASF Language Support:
-
-- Full TextMate syntax highlighting for all ASF language constructs
-- 20+ code snippets covering functions, classes, loops, imports/exports, and more
-- Language configuration with bracket matching, auto-closing, comment toggling, and smart indentation
-- Hover provider with keyword descriptions
-- Basic completion provider for built-in objects
-- Folding range support
-- Support for `.vas` file extensions
-
 ---
 
 ## For more information
