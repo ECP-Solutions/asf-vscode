@@ -2,7 +2,7 @@
   "name": "asf-language",
   "displayName": "VBA Advanced Scripting Syntax",
   "description": "Advanced Scripting Framework language support for VS Code",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "ECPSolutions",
   "icon": "icons/asf-icon.png",
   "engines": {
@@ -11,10 +11,11 @@
   "categories": [
     "Programming Languages"
   ],
+  "main": "./extension.js",
   "contributes": {
     "languages": [{
       "id": "asf",
-      "aliases": ["ASF", "asf"],
+      "aliases": ["ASF", "Advanced Scripting Framework"],
       "extensions": [".vas"],
       "configuration": "./language-configuration.json",
       "icon": {
@@ -32,7 +33,17 @@
         "language": "asf",
         "path": "./snippets/asf.json"
       }
-    ]
+    ],
+    "configurationDefaults": {
+      "[asf]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+      },
+      "files.associations": {
+        "*.asf": "asf",
+        "*.vas": "asf"
+      }
+    }
   },
   "repository": {
     "type": "git",

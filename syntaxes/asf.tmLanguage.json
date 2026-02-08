@@ -2,213 +2,300 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "ASF",
   "scopeName": "source.asf",
+  "fileTypes": ["vas"],
   "patterns": [
     { "include": "#comments" },
-    { "include": "#keywords" },
+    { "include": "#class-declaration" },
+    { "include": "#function-declaration" },
+    { "include": "#export-function-declaration" },
+    { "include": "#constructor-declaration" },
+    { "include": "#static-method-declaration" },
+    { "include": "#field-declaration" },
+    { "include": "#let-declaration" },
+    { "include": "#import-statement" },
+    { "include": "#export-statement" },
+    { "include": "#control-keywords" },
+    { "include": "#storage-keywords" },
+    { "include": "#language-constants" },
+    { "include": "#operator-keywords" },
+    { "include": "#builtin-functions" },
     { "include": "#strings" },
     { "include": "#template-strings" },
     { "include": "#vba-escape" },
     { "include": "#numbers" },
+    { "include": "#spread-operator" },
     { "include": "#operators" },
-    { "include": "#constants" },
-    { "include": "#functions" },
-    { "include": "#classes" },
-    { "include": "#variables" }
+    { "include": "#punctuation" },
+    { "include": "#function-call" },
+    { "include": "#identifiers" }
   ],
   "repository": {
+
     "comments": {
       "patterns": [
+        {
+          "name": "comment.line.hash.asf",
+          "match": "#.*$"
+        },
         {
           "name": "comment.line.double-slash.asf",
           "match": "//.*$"
         },
         {
-          "name": "comment.line.hash-symbol.asf",
-          "match": "#.*$"
-        },
-        {
           "name": "comment.block.asf",
           "begin": "/\\*",
-          "end": "\\*/"
+          "end": "\\*/",
+          "captures": {
+            "0": { "name": "punctuation.definition.comment.asf" }
+          }
         }
       ]
     },
-    "keywords": {
+
+    "class-declaration": {
+      "match": "\\b(class)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\\s+(extends)\\s+([a-zA-Z_][a-zA-Z0-9_]*))?",
+      "captures": {
+        "1": { "name": "storage.type.class.asf" },
+        "2": { "name": "entity.name.type.class.asf" },
+        "3": { "name": "storage.modifier.extends.asf" },
+        "4": { "name": "entity.other.inherited-class.asf" }
+      }
+    },
+
+    "function-declaration": {
+      "match": "\\b(fun)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+      "captures": {
+        "1": { "name": "storage.type.function.asf" },
+        "2": { "name": "entity.name.function.asf" }
+      }
+    },
+
+    "export-function-declaration": {
+      "match": "\\b(export)\\s+(fun)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+      "captures": {
+        "1": { "name": "keyword.control.export.asf" },
+        "2": { "name": "storage.type.function.asf" },
+        "3": { "name": "entity.name.function.asf" }
+      }
+    },
+
+    "constructor-declaration": {
+      "match": "\\b(constructor)\\s*(?=\\()",
+      "captures": {
+        "1": { "name": "storage.type.constructor.asf" }
+      }
+    },
+
+    "static-method-declaration": {
+      "match": "\\b(static)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+      "captures": {
+        "1": { "name": "storage.modifier.static.asf" },
+        "2": { "name": "entity.name.function.asf" }
+      }
+    },
+
+    "field-declaration": {
+      "match": "\\b(field)\\b",
+      "captures": {
+        "1": { "name": "storage.type.field.asf" }
+      }
+    },
+
+    "let-declaration": {
+      "match": "\\b(let)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+      "captures": {
+        "1": { "name": "storage.type.variable.asf" },
+        "2": { "name": "variable.other.readwrite.asf" }
+      }
+    },
+
+    "import-statement": {
+      "begin": "\\b(import)\\b",
+      "end": "(?=;|$)",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.import.asf" }
+      },
       "patterns": [
         {
-          "name": "keyword.control.asf",
-          "match": "\\b(if|elseif|else|for|in|of|while|switch|case|default|break|continue|return|try|catch)\\b"
+          "match": "\\b(from)\\b",
+          "name": "keyword.control.from.asf"
         },
         {
-          "name": "keyword.control.import.asf",
-          "match": "\\b(import|export|from|as)\\b"
+          "match": "\\b(as)\\b",
+          "name": "keyword.control.as.asf"
         },
         {
-          "name": "keyword.other.asf",
-          "match": "\\b(typeof|new|this|super)\\b"
+          "match": "\\*",
+          "name": "keyword.operator.namespace.asf"
         },
+        { "include": "#strings" },
         {
-          "name": "storage.type.asf",
-          "match": "\\b(let|fun|class|field|constructor|static|extends)\\b"
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "variable.other.readwrite.asf"
         },
-        {
-          "name": "keyword.other.print.asf",
-          "match": "\\b(print)\\b"
-        }
+        { "include": "#punctuation" }
       ]
     },
-    "constants": {
+
+    "export-statement": {
       "patterns": [
         {
-          "name": "constant.language.asf",
-          "match": "\\b(true|false|null)\\b"
+          "match": "\\b(export)\\s+(default)\\b",
+          "captures": {
+            "1": { "name": "keyword.control.export.asf" },
+            "2": { "name": "keyword.control.default.asf" }
+          }
+        },
+        {
+          "match": "\\b(export)\\b",
+          "name": "keyword.control.export.asf"
         }
       ]
     },
+
+    "control-keywords": {
+      "match": "\\b(if|elseif|else|for|in|of|while|switch|case|default|break|continue|return|try|catch)\\b",
+      "name": "keyword.control.asf"
+    },
+
+    "storage-keywords": {
+      "patterns": [
+        { "match": "\\b(fun)\\b",         "name": "storage.type.function.asf" },
+        { "match": "\\b(class)\\b",       "name": "storage.type.class.asf" },
+        { "match": "\\b(let)\\b",         "name": "storage.type.variable.asf" },
+        { "match": "\\b(field)\\b",       "name": "storage.type.field.asf" },
+        { "match": "\\b(constructor)\\b", "name": "storage.type.constructor.asf" },
+        { "match": "\\b(static)\\b",      "name": "storage.modifier.static.asf" },
+        { "match": "\\b(extends)\\b",     "name": "storage.modifier.extends.asf" }
+      ]
+    },
+
+    "language-constants": {
+      "match": "\\b(true|false|null)\\b",
+      "name": "constant.language.asf"
+    },
+
+    "operator-keywords": {
+      "patterns": [
+        { "match": "\\b(typeof)\\b", "name": "keyword.operator.typeof.asf" },
+        { "match": "\\b(new)\\b",    "name": "keyword.operator.new.asf" },
+        { "match": "\\b(this)\\b",   "name": "variable.language.this.asf" },
+        { "match": "\\b(super)\\b",  "name": "variable.language.super.asf" }
+      ]
+    },
+
+    "builtin-functions": {
+      "match": "\\b(print)\\s*(?=\\()",
+      "captures": {
+        "1": { "name": "support.function.builtin.asf" }
+      }
+    },
+
     "strings": {
       "patterns": [
         {
           "name": "string.quoted.double.asf",
           "begin": "\"",
-          "end": "\"",
+          "end": "\"|$",
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.asf" } },
+          "endCaptures":   { "0": { "name": "punctuation.definition.string.end.asf" } },
           "patterns": [
-            {
-              "name": "constant.character.escape.asf",
-              "match": "\\\\([\\\\'\"ntr])"
-            }
+            { "name": "constant.character.escape.asf", "match": "\\\\[\\\\'\"ntr]" }
           ]
         },
         {
           "name": "string.quoted.single.asf",
           "begin": "'",
-          "end": "'",
+          "end": "'|$",
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.asf" } },
+          "endCaptures":   { "0": { "name": "punctuation.definition.string.end.asf" } },
           "patterns": [
-            {
-              "name": "constant.character.escape.asf",
-              "match": "\\\\([\\\\'\"ntr])"
-            }
+            { "name": "constant.character.escape.asf", "match": "\\\\[\\\\'\"ntr]" }
           ]
         }
       ]
     },
+
     "template-strings": {
       "name": "string.template.asf",
       "begin": "`",
       "end": "`",
+      "beginCaptures": { "0": { "name": "punctuation.definition.string.template.begin.asf" } },
+      "endCaptures":   { "0": { "name": "punctuation.definition.string.template.end.asf" } },
       "patterns": [
+        { "name": "constant.character.escape.asf", "match": "\\\\[\\\\`ntr$]" },
         {
-          "name": "meta.template.expression.asf",
           "begin": "\\$\\{",
           "end": "\\}",
-          "beginCaptures": {
-            "0": { "name": "punctuation.definition.template-expression.begin.asf" }
-          },
-          "endCaptures": {
-            "0": { "name": "punctuation.definition.template-expression.end.asf" }
-          },
-          "patterns": [
-            { "include": "$self" }
-          ]
+          "beginCaptures": { "0": { "name": "punctuation.definition.template-expression.begin.asf" } },
+          "endCaptures":   { "0": { "name": "punctuation.definition.template-expression.end.asf" } },
+          "contentName": "meta.template.expression.asf",
+          "patterns": [ { "include": "source.asf" } ]
         }
       ]
     },
+
     "vba-escape": {
-      "name": "meta.vba-escape.asf",
       "begin": "@\\(",
       "end": "\\)",
-      "beginCaptures": {
-        "0": { "name": "punctuation.definition.vba-escape.begin.asf" }
-      },
-      "endCaptures": {
-        "0": { "name": "punctuation.definition.vba-escape.end.asf" }
-      },
-      "contentName": "source.vba.embedded.asf"
+      "beginCaptures": { "0": { "name": "punctuation.section.embedded.begin.asf" } },
+      "endCaptures":   { "0": { "name": "punctuation.section.embedded.end.asf" } },
+      "contentName": "meta.embedded.vba.asf",
+      "patterns": [
+        { "match": "[^)]+", "name": "string.unquoted.vba-expression.asf" }
+      ]
     },
+
     "numbers": {
       "patterns": [
-        {
-          "name": "constant.numeric.decimal.asf",
-          "match": "\\b\\d+\\.\\d+([eE][+-]?\\d+)?\\b"
-        },
-        {
-          "name": "constant.numeric.integer.asf",
-          "match": "\\b\\d+\\b"
-        }
+        { "name": "constant.numeric.float.asf",   "match": "\\b\\d+\\.\\d+([eE][+-]?\\d+)?\\b" },
+        { "name": "constant.numeric.integer.asf", "match": "\\b\\d+\\b" }
       ]
     },
+
+    "spread-operator": {
+      "match": "\\.\\.\\.",
+      "name": "keyword.operator.spread.asf"
+    },
+
     "operators": {
       "patterns": [
-        {
-          "name": "keyword.operator.assignment.asf",
-          "match": "(\\+=|-=|\\*=|/=|%=|=)"
-        },
-        {
-          "name": "keyword.operator.comparison.asf",
-          "match": "(==|!=|<=|>=|<|>)"
-        },
-        {
-          "name": "keyword.operator.logical.asf",
-          "match": "(\\|\\||&&|!)"
-        },
-        {
-          "name": "keyword.operator.bitwise.asf",
-          "match": "(\\||&|\\^|<<|>>)"
-        },
-        {
-          "name": "keyword.operator.arithmetic.asf",
-          "match": "(\\+|-|\\*|/|%|\\^)"
-        },
-        {
-          "name": "keyword.operator.spread.asf",
-          "match": "\\.\\.\\."
-        },
-        {
-          "name": "keyword.operator.ternary.asf",
-          "match": "\\?|:"
-        }
+        { "match": "===|!==|==|!=",     "name": "keyword.operator.comparison.asf" },
+        { "match": "<=|>=|<|>",         "name": "keyword.operator.relational.asf" },
+        { "match": "\\|\\||&&",         "name": "keyword.operator.logical.asf" },
+        { "match": "!(?!=)",            "name": "keyword.operator.logical.not.asf" },
+        { "match": "\\+=|-=|\\*=|/=|%=","name": "keyword.operator.assignment.compound.asf" },
+        { "match": "=(?!=)",            "name": "keyword.operator.assignment.asf" },
+        { "match": "<<|>>",             "name": "keyword.operator.bitwise.shift.asf" },
+        { "match": "\\||&|\\^",         "name": "keyword.operator.bitwise.asf" },
+        { "match": "\\+|-|\\*|/|%",     "name": "keyword.operator.arithmetic.asf" },
+        { "match": "\\?",               "name": "keyword.operator.ternary.asf" },
+        { "match": ":",                 "name": "punctuation.separator.colon.asf" },
+        { "match": "\\.",               "name": "punctuation.accessor.asf" }
       ]
     },
-    "functions": {
+
+    "punctuation": {
       "patterns": [
-        {
-          "name": "meta.function.asf",
-          "match": "\\b(fun)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
-          "captures": {
-            "1": { "name": "storage.type.function.asf" },
-            "2": { "name": "entity.name.function.asf" }
-          }
-        },
-        {
-          "name": "entity.name.function.asf",
-          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\()"
-        }
+        { "match": ";",   "name": "punctuation.terminator.statement.asf" },
+        { "match": ",",   "name": "punctuation.separator.comma.asf" },
+        { "match": "\\{", "name": "punctuation.definition.block.begin.asf" },
+        { "match": "\\}", "name": "punctuation.definition.block.end.asf" },
+        { "match": "\\(", "name": "punctuation.definition.paren.begin.asf" },
+        { "match": "\\)", "name": "punctuation.definition.paren.end.asf" },
+        { "match": "\\[", "name": "punctuation.definition.bracket.begin.asf" },
+        { "match": "\\]", "name": "punctuation.definition.bracket.end.asf" }
       ]
     },
-    "classes": {
-      "patterns": [
-        {
-          "name": "meta.class.asf",
-          "match": "\\b(class)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\\s+(extends)\\s+([a-zA-Z_][a-zA-Z0-9_]*))?",
-          "captures": {
-            "1": { "name": "storage.type.class.asf" },
-            "2": { "name": "entity.name.type.class.asf" },
-            "3": { "name": "storage.modifier.extends.asf" },
-            "4": { "name": "entity.other.inherited-class.asf" }
-          }
-        },
-        {
-          "name": "storage.modifier.asf",
-          "match": "\\b(static|constructor)\\b"
-        }
-      ]
+
+    "function-call": {
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+      "captures": { "1": { "name": "entity.name.function.call.asf" } }
     },
-    "variables": {
-      "patterns": [
-        {
-          "name": "variable.other.asf",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
-        }
-      ]
+
+    "identifiers": {
+      "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+      "name": "variable.other.readwrite.asf"
     }
   }
 }

@@ -113,11 +113,12 @@
     "prefix": "switch",
     "body": [
       "switch (${1:expression}) {",
-      "\tcase ${2:value}:",
+      "\tcase ${2:value}{",
       "\t\t$3",
-      "\t\tbreak;",
-      "\tdefault:",
+      "\t}",
+      "\tdefault{",
       "\t\t$0",
+      "\t}",
       "};"
     ],
     "description": "Switch statement"
