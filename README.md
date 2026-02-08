@@ -21,6 +21,8 @@ Full TextMate grammar covering every construct in the ASF language:
 - **Classes** — class names, inherited classes, constructors, static methods, and field declarations
 - **Functions** — named declarations and anonymous function expressions
 
+![ASF](/assets/ASF.png)
+
 ### Code Snippets
 
 Over 20 built-in snippets for rapid development:
