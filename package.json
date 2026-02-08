@@ -1,9 +1,10 @@
 {
   "name": "asf-language",
-  "displayName": "ASF Language Support",
+  "displayName": "VBA Advanced Scripting Syntax",
   "description": "Advanced Scripting Framework language support for VS Code",
   "version": "1.0.1",
-  "publisher": "ECP SOlutions",
+  "publisher": "ECPSolutions",
+  "icon": "icons/asf-icon.png",
   "engines": {
     "vscode": "^1.109.0"
   },
