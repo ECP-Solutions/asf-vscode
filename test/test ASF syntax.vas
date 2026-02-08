@@ -1,7 +1,17 @@
 // ASF Test File
 import Math from "stdlib/math";
 import { sum, multiply } from "utils";
-
+for (item of object) {
+    let name = value;
+    switch (expression) {
+        case value{
+            
+        }
+        default{
+            
+        }
+    };
+};
 class Calculator extends BaseCalculator {
     field result = 0;
     # Class constructor
@@ -30,7 +40,7 @@ fun fibonacci(n) {
 
 // Template strings
 let name = "World";
-let greeting = `Hello, ${name}!`;
+let greeting = `Hello, ${name}!`
 print(greeting);
 
 // Array operations with spread

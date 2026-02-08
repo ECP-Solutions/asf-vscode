@@ -6,6 +6,7 @@ const vscode = require('vscode');
 
 function activate(context) {
     console.log('ASF Language Extension is now active');
+    vscode.window.showInformationMessage('ASF Language Extension activated ✓');
 
     // ── Diagnostic Collection ────────────────────────────────────
     const diagCollection = vscode.languages.createDiagnosticCollection('asf');
@@ -280,7 +281,12 @@ function validateDocument(document, diagCollection) {
         if (i >= len) return i;
         if (tokens[i].value === '{') {
             i++;
-            while (i < len && tokens[i].value !== '}') { if (tokens[i].value===';') { i++; continue; } parseStmt(); }
+            while (i < len && tokens[i].value !== '}') {
+                if (tokens[i].value===';') { i++; continue; }
+                const before = i;
+                parseStmt();
+                if (i === before) i++; // safety: skip stuck token
+            }
             if (i < len && tokens[i].value === '}') i++;
             return i;
         }
@@ -292,7 +298,9 @@ function validateDocument(document, diagCollection) {
         while (i < len) {
             if (tokens[i].value === ';') { i++; continue; }
             if (tokens[i].value === '}') break;
+            const before = i;
             parseStmt();
+            if (i === before) i++; // safety: skip stuck token
         }
     }
 
@@ -324,7 +332,12 @@ function validateDocument(document, diagCollection) {
                 if (i<len && tokens[i].value==='extends') { i++; if (i<len) i++; }
                 if (i<len && tokens[i].value==='{') {
                     i++; contextStack.push('class');
-                    while (i<len && tokens[i].value!=='}') { if (tokens[i].value===';') { i++; continue; } parseStmt(); }
+                    while (i<len && tokens[i].value!=='}') {
+                        if (tokens[i].value===';') { i++; continue; }
+                        const before = i;
+                        parseStmt();
+                        if (i === before) i++;
+                    }
                     contextStack.pop();
                     if (i<len && tokens[i].value==='}') i++;
                 }

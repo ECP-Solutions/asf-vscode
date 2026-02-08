@@ -76,6 +76,15 @@
   "For-In Loop": {
     "prefix": "forin",
     "body": [
+      "for (${1:key} in ${2:object}) {",
+      "\t$0",
+      "};"
+    ],
+    "description": "For-in object loop"
+  },
+  "For-In array": {
+    "prefix": "forin",
+    "body": [
       "for (${1:key} in ${2:array}) {",
       "\t$0",
       "};"
@@ -91,7 +100,7 @@
     ],
     "description": "For-of array loop"
   },
-  "For-Of object Loop": {
+  "For-Of object": {
     "prefix": "forof",
     "body": [
       "for (${1:item} of ${2:object}) {",
