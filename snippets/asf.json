@@ -4,7 +4,7 @@
     "body": [
       "fun ${1:name}(${2:params}) {",
       "\t$0",
-      "}"
+      "};"
     ],
     "description": "Function declaration"
   },
@@ -15,7 +15,7 @@
       "\tconstructor(${2:params}) {",
       "\t\t$0",
       "\t}",
-      "}"
+      "};"
     ],
     "description": "Class declaration"
   },
@@ -27,7 +27,7 @@
       "\t\tsuper(${4:args});",
       "\t\t$0",
       "\t}",
-      "}"
+      "};"
     ],
     "description": "Class declaration with extends"
   },
@@ -36,7 +36,7 @@
     "body": [
       "if (${1:condition}) {",
       "\t$0",
-      "}"
+      "};"
     ],
     "description": "If statement"
   },
@@ -47,7 +47,7 @@
       "\t$2",
       "} else {",
       "\t$0",
-      "}"
+      "};"
     ],
     "description": "If-else statement"
   },
@@ -60,43 +60,52 @@
       "\t$4",
       "} else {",
       "\t$0",
-      "}"
+      "};"
     ],
     "description": "If-elseif-else statement"
   },
   "For Loop (C-style)": {
     "prefix": "for",
     "body": [
-      "for (${1:i = 0}, ${2:i < length}, ${3:i = i + 1}) {",
+      "for (${1:i = 0}, ${2:i < n}, ${3:i = i + 1}) {",
       "\t$0",
-      "}"
+      "};"
     ],
     "description": "C-style for loop"
   },
   "For-In Loop": {
     "prefix": "forin",
     "body": [
-      "for (${1:key} in ${2:object}) {",
+      "for (${1:key} in ${2:array}) {",
       "\t$0",
-      "}"
+      "};"
     ],
-    "description": "For-in loop"
+    "description": "For-in array loop"
   },
   "For-Of Loop": {
     "prefix": "forof",
     "body": [
       "for (${1:item} of ${2:array}) {",
       "\t$0",
-      "}"
+      "};"
     ],
-    "description": "For-of loop"
+    "description": "For-of array loop"
+  },
+  "For-Of Loop": {
+    "prefix": "forof",
+    "body": [
+      "for (${1:item} of ${2:object}) {",
+      "\t$0",
+      "};"
+    ],
+    "description": "For-of object loop"
   },
   "While Loop": {
     "prefix": "while",
     "body": [
       "while (${1:condition}) {",
       "\t$0",
-      "}"
+      "};"
     ],
     "description": "While loop"
   },
@@ -109,7 +118,7 @@
       "\t\tbreak;",
       "\tdefault:",
       "\t\t$0",
-      "}"
+      "};"
     ],
     "description": "Switch statement"
   },
@@ -120,7 +129,7 @@
       "\t$1",
       "} catch (${2:error}) {",
       "\t$0",
-      "}"
+      "};"
     ],
     "description": "Try-catch block"
   },
@@ -190,7 +199,7 @@
   "Arrow Function": {
     "prefix": "afun",
     "body": [
-      "fun(${1:params}) { ${2:body} }"
+      "fun(${1:params}) { ${2:body} };"
     ],
     "description": "Anonymous function"
   },
