@@ -2,7 +2,8 @@
   "name": "asf-language",
   "displayName": "ASF Language Support",
   "description": "Advanced Scripting Framework language support for VS Code",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "publisher": "ECP SOlutions",
   "engines": {
     "vscode": "^1.109.0"
   },
