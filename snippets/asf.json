@@ -13,7 +13,7 @@
     "body": [
       "{",
       "\t${1:key1}: ${2:value1}",
-      "\t${3:key2}: ${4:value2}"
+      "\t${3:key2}: ${4:value2}",
       "};"
     ],
     "description": "Object Literal"
