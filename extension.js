@@ -1,10 +1,10 @@
-import * as vscode from 'vscode';
+const vscode = require('vscode');
 
 // ═════════════════════════════════════════════════════════════════
 //  ACTIVATION
 // ═════════════════════════════════════════════════════════════════
 
-export function activate(context) {
+function activate(context) {
     // ── Diagnostic Collection ────────────────────────────────────
     const diagCollection = vscode.languages.createDiagnosticCollection('asf');
     context.subscriptions.push(diagCollection);
@@ -1159,4 +1159,5 @@ function parseClassMembers(body, bodyOffset, document) {
 }
 
 // ═════════════════════════════════════════════════════════════════
-export function deactivate() {}
+function deactivate() {}
+module.exports = { activate, deactivate };
