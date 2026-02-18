@@ -2,7 +2,7 @@
 
 A comprehensive Visual Studio Code extension providing rich language support for the **Advanced Scripting Framework (ASF)** — a modern, JavaScript-like scripting language implemented entirely in VBA that transforms VBA into a powerful script host.
 
-ASF brings first-class functions, closures, classes, modules, template literals, destructuring, spread/rest operators, and much more to the VBA ecosystem. This extension makes writing ASF code a first-class experience inside VS Code.
+ASF brings first-class functions, closures, classes, modules, template literals, destructuring, spread/rest operators, COM object prototype extension, and much more to the VBA ecosystem. This extension makes writing ASF code a first-class experience inside VS Code.
 
 ## Features
 
@@ -12,6 +12,7 @@ Full TextMate grammar covering every construct in the ASF language:
 
 - **Keywords & control flow** — `if`, `elseif`, `else`, `for`, `while`, `switch`, `case`, `try`, `catch`, `return`, `break`, `continue`
 - **Declarations** — `let`, `fun`, `class`, `field`, `constructor`, `static`, `extends`
+- **Prototype extensions** — `prototype.COM.ObjectType methodName()` syntax for COM object monkey patching
 - **Module system** — `import`, `export`, `from`, `as`, `default`
 - **Literals** — numbers, single/double-quoted strings with escape sequences, booleans (`true`, `false`), `null`
 - **Template strings** — backtick strings with `${expression}` interpolation, fully recursive highlighting
@@ -20,39 +21,50 @@ Full TextMate grammar covering every construct in the ASF language:
 - **Comments** — line (`//`) and block (`/* */`)
 - **Classes** — class names, inherited classes, constructors, static methods, and field declarations
 - **Functions** — named declarations and anonymous function expressions
+- **Office COM objects** — syntax highlighting for Excel, Word, PowerPoint, Access, and Outlook object types
 
 ![ASF](/assets/ASF.png)
 
 ### Code Snippets
 
-Over 20 built-in snippets for rapid development:
+Over 30 built-in snippets for rapid development:
 
-| Prefix    | Description                          |
-|-----------|--------------------------------------|
-| `fun`     | Function declaration                 |
-| `afun`    | Anonymous function expression        |
-| `class`   | Class declaration                    |
-| `classx`  | Class with `extends`                 |
-| `if`      | If statement                         |
-| `ife`     | If-else statement                    |
-| `ifel`    | If-elseif-else statement             |
-| `for`     | C-style for loop                     |
-| `forin`   | For-in loop                          |
-| `forof`   | For-of loop                          |
-| `while`   | While loop                           |
-| `switch`  | Switch statement                     |
-| `try`     | Try-catch block                      |
-| `let`     | Variable declaration                 |
-| `imp`     | Default import                       |
-| `impn`    | Named import                         |
-| `impns`   | Namespace import (`* as`)            |
-| `exp`     | Named export                         |
-| `expd`    | Default export                       |
-| `dest`    | Array destructuring                  |
-| `destr`   | Array destructuring with rest        |
-| `print`   | Print statement                      |
-| `tpl`     | Template literal                     |
-| `vba`     | VBA escape hatch `@(...)`            |
+| Prefix            | Description                          |
+|-------------------|--------------------------------------|
+| `fun`             | Function declaration                 |
+| `afun`            | Anonymous function expression        |
+| `class`           | Class declaration                    |
+| `classx`          | Class with `extends`                 |
+| `if`              | If statement                         |
+| `ife`             | If-else statement                    |
+| `ifel`            | If-elseif-else statement             |
+| `for`             | C-style for loop                     |
+| `forin`           | For-in loop                          |
+| `forof`           | For-of loop                          |
+| `while`           | While loop                           |
+| `switch`          | Switch statement                     |
+| `try`             | Try-catch block                      |
+| `let`             | Variable declaration                 |
+| `imp`             | Default import                       |
+| `impn`            | Named import                         |
+| `impns`           | Namespace import (`* as`)            |
+| `exp`             | Named export                         |
+| `expd`            | Default export                       |
+| `dest`            | Array destructuring                  |
+| `destr`           | Array destructuring with rest        |
+| `print`           | Print statement                      |
+| `tpl`             | Template literal                     |
+| `vba`             | VBA escape hatch `@(...)`            |
+| `prototype`       | COM prototype method definition      |
+| `protorange`      | Excel Range prototype method         |
+| `protolistrow`    | Excel ListRow prototype method       |
+| `protoworksheet`  | Excel Worksheet prototype method     |
+| `protodocument`   | Word Document prototype method       |
+| `protopresentation` | PowerPoint Presentation prototype method |
+| `protoslide`      | PowerPoint Slide prototype method    |
+| `protorecordset`  | Access Recordset prototype method    |
+| `protomailitem`   | Outlook MailItem prototype method    |
+| `this`            | COM object property access via 'this' |
 
 ### Language Configuration
 
@@ -66,8 +78,30 @@ Over 20 built-in snippets for rapid development:
 ### IntelliSense & Editor Support
 
 - **Hover information** — hover over keywords to see quick descriptions
-- **Basic completions** — suggestions for built-in objects and language keywords
+- **Code completions** — suggestions for built-in objects, language keywords, and Office COM objects
+- **Office COM objects** — IntelliSense support for 180+ Office objects from Excel, Word, PowerPoint, Access, and Outlook
+- **Prototype method navigation** — COM prototype methods appear in VS Code outline and symbol navigation
 - **Folding ranges** — intelligent code folding based on block structure
+
+### COM Prototype Extension
+
+Support for ASF's COM object monkey patching syntax (ASF v3.1.2+):
+
+- **Prototype method definition** — `prototype.COM.ObjectType methodName() { ... }` syntax highlighting
+- **Context-aware `this` binding** — proper highlighting of `this` keyword within prototype methods  
+- **Office object types** — recognition of Excel (`Range`, `Worksheet`, `ListRow`), Word (`Document`, `Paragraph`), PowerPoint (`Slide`, `Presentation`), Access (`Recordset`, `Form`), and Outlook (`MailItem`, `Folder`) object types
+- **Method chaining support** — snippets include `return this;` for fluent interfaces
+- **Application-specific templates** — dedicated snippets for each Office application's common objects
+
+Example prototype method:
+
+```javascript
+prototype.COM.Range formatCurrency() {
+    this.NumberFormat = "$#,##0.00";
+    this.Font.Bold = true;
+    return this; // Enable method chaining
+}
+```
 
 ## Requirements
 
@@ -77,6 +111,7 @@ To actually *run* ASF scripts, you will need:
 
 - Microsoft Excel or Access (as the VBA host)
 - The ASF runtime library imported into your VBA project
+- ASF v3.1.2 or later for COM prototype extension features
 
 See the [ASF documentation](https://ecp-solutions.github.io/ASF/) for setup instructions.
 

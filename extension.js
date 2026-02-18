@@ -95,6 +95,7 @@ function activate(context) {
             const kws = [
                 ['fun','Keyword'],['class','Keyword'],['let','Keyword'],['field','Keyword'],
                 ['constructor','Keyword'],['static','Keyword'],['extends','Keyword'],
+                ['prototype','Keyword'],['COM','Keyword'],
                 ['if','Keyword'],['elseif','Keyword'],['else','Keyword'],
                 ['for','Keyword'],['while','Keyword'],['switch','Keyword'],
                 ['case','Keyword'],['default','Keyword'],
@@ -110,6 +111,64 @@ function activate(context) {
             for (const name of ['Math','Array','String','Object','RegExp']) {
                 const c = new vscode.CompletionItem(name, vscode.CompletionItemKind.Class);
                 c.detail = 'Built-in object';
+                items.push(c);
+            }
+            
+            // Office COM Objects - comprehensive list
+            const officeObjects = [
+                // Excel Objects
+                'Range','Worksheet','Workbook','Worksheets','Workbooks','Application',
+                'ListRow','ListRows','ListObject','ListObjects','ListColumn','ListColumns',
+                'Chart','Charts','ChartArea','ChartTitle','Series','SeriesCollection',
+                'PivotTable','PivotTables','PivotField','PivotFields','PivotCache',
+                'Shapes','Shape','TextFrame','Font','Interior','Borders','Border',
+                'Name','Names','Comment','Comments','Hyperlink','Hyperlinks',
+                'PageSetup','PrintArea','AutoFilter','Sort','CustomView','CustomViews',
+                
+                // Word Objects  
+                'Document','Documents','Selection','Paragraph','Paragraphs',
+                'Table','Tables','Row','Rows','Column','Columns','Cell','Cells',
+                'Section','Sections','HeaderFooter','Field','Fields','Bookmark','Bookmarks',
+                'Style','Styles','Template','Find','Replacement','View','Window','Windows',
+                'InlineShape','InlineShapes','FormField','FormFields','Variable','Variables',
+                'Revision','Revisions','Comment','Comments','Footnote','Footnotes',
+                
+                // PowerPoint Objects
+                'Presentation','Presentations','Slide','Slides','SlideRange',
+                'SlideShowTransition','SlideShowSettings','CustomShow','CustomShows',
+                'Master','SlideMaster','TitleMaster','NotesMaster','HandoutMaster',
+                'TextRange','TextFrame','PlaceholderFormat','ColorScheme','ColorSchemes',
+                'Animation','AnimationSettings','SlideShowView','SlideShowWindow',
+                'ActionSetting','ActionSettings','Hyperlink','Hyperlinks',
+                
+                // Access Objects
+                'DoCmd','CurrentDb','TableDef','TableDefs','QueryDef','QueryDefs',
+                'Recordset','Field','Fields','Index','Indexes','Relation','Relations',
+                'Form','Forms','Report','Reports','Control','Controls',
+                'Module','Modules','Reference','References','Property','Properties',
+                'Database','Workspace','Workspaces','User','Users','Group','Groups',
+                
+                // Outlook Objects
+                'MailItem','AppointmentItem','ContactItem','TaskItem','JournalItem',
+                'Folder','Folders','Store','Stores','Account','Accounts',
+                'Recipient','Recipients','Attachment','Attachments','Inspector','Inspectors',
+                'Explorer','Explorers','AddressEntry','AddressList','AddressLists',
+                'NameSpace','MAPIFolder','Items','Item','PropertyAccessor',
+                
+                // Common Office Objects
+                'CommandBar','CommandBars','CommandBarControl','CommandBarControls',
+                'CommandBarButton','CommandBarComboBox','CommandBarPopup',
+                'FileDialog','COMAddIn','COMAddIns','Assistant','AnswerWizard',
+                'LanguageSettings','MsoDebugOptions','OfficeDataSourceObject',
+                'DocumentProperty','DocumentProperties','CustomDocumentProperty',
+                'SmartTag','SmartTags','SmartDocument','XMLNode','XMLNodes',
+                'Signature','SignatureSet','PolicyItem','ServerPolicy'
+            ];
+            
+            for (const name of officeObjects) {
+                const c = new vscode.CompletionItem(name, vscode.CompletionItemKind.Class);
+                c.detail = 'Office COM Object';
+                c.documentation = new vscode.MarkdownString(`**${name}** - Office COM Object\n\nCan be extended with prototype methods:\n\`\`\`asf\nprototype.COM.${name} customMethod() {\n    // Access object via 'this'\n    return this;\n}\n\`\`\``);
                 items.push(c);
             }
             
@@ -143,6 +202,13 @@ function activate(context) {
             importSnippet.documentation = new vscode.MarkdownString('Import named exports from a module:\n```asf\nimport { sum, avg } from "utils";\n```');
             items.push(importSnippet);
             
+            // Prototype method snippet
+            const protoSnippet = new vscode.CompletionItem('prototype', vscode.CompletionItemKind.Snippet);
+            protoSnippet.insertText = new vscode.SnippetString('prototype.COM.${1:ClassName} ${2:methodName}(${3:params}) {\n\t${4:// Method implementation}\n\treturn this; // Enable chaining\n};');
+            protoSnippet.detail = 'COM prototype method';
+            protoSnippet.documentation = new vscode.MarkdownString('Define a monkey patching method for COM objects:\n```asf\nprototype.COM.Range formatCurrency() {\n\tthis.NumberFormat = "$#,##0.00";\n\treturn this;\n};\n```');
+            items.push(protoSnippet);
+            
             // Array literal snippet
             const arraySnippet = new vscode.CompletionItem('arr', vscode.CompletionItemKind.Snippet);
             arraySnippet.insertText = new vscode.SnippetString('[${1:item1}, ${2:item2}]');
@@ -165,7 +231,7 @@ const RESERVED = new Set([
     'if','elseif','else','for','in','of','while','switch','case','default',
     'break','continue','return','try','catch','fun','class','let','field',
     'constructor','static','extends','import','export','from','as',
-    'new','typeof','this','super','print','true','false','null'
+    'new','typeof','this','super','print','true','false','null','prototype'
 ]);
 
 const STMT_STARTERS = new Set([
@@ -985,6 +1051,23 @@ function buildOutlineSymbols(document) {
         funRanges.push([frM.index, matchBrace(stripped, bi)]);
     }
     function inFun(off) { for (const [s,e] of funRanges) if (off>s&&off<e) return true; return false; }
+
+    // ── Prototype definitions ────────────────────────────────
+    const protoRe = /\b(prototype)\.(COM)\.(\w+)\s+(\w+)\s*\(/g;
+    let protoM;
+    while ((protoM = protoRe.exec(stripped)) !== null) {
+        const comType = protoM[3], methodName = protoM[4];
+        const po = stripped.indexOf('(', protoM.index + protoM[0].length - 1);
+        const pc = matchParen(stripped, po);
+        const ns = stripped.substring(pc+1).search(/\S/);
+        if (ns===-1) continue;
+        const bi = pc+1+ns; if (stripped[bi]!=='{') continue;
+        const bc = matchBrace(stripped, bi);
+        const nOff = protoM.index + protoM[0].indexOf(methodName);
+        const params = stripped.substring(po+1, pc).trim();
+        const detail = `COM.${comType} ${params?`(${params})`:'()'}`;
+        safePush(sym(methodName, detail, vscode.SymbolKind.Method, nOff, protoM.index, bc));
+    }
 
     // ── Classes ──────────────────────────────────────────────
     const clsRe = /\b(class)\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\s+(extends)\s+([a-zA-Z_][a-zA-Z0-9_]*))?\s*\{/g;

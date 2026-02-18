@@ -230,6 +230,111 @@
     ],
     "description": "Template literal"
   },
+  "Prototype Method Definition": {
+    "prefix": "prototype",
+    "body": [
+      "prototype.COM.${1:ClassName} ${2:methodName}($3) {",
+      "\t${4:// Method implementation}",
+      "\t${5:// 'this' refers to the COM object instance}",
+      "\treturn ${6:this}; ${7:// Enable method chaining}",
+      "};"
+    ],
+    "description": "Define a COM prototype method for monkey patching"
+  },
+  "Prototype Range Method": {
+    "prefix": "protorange",
+    "body": [
+      "prototype.COM.Range ${1:methodName}($2) {",
+      "\t${3:// Access range properties via 'this'}",
+      "\t${4:// this.Value, this.Address, this.Cells, etc.}",
+      "\treturn this; // Enable chaining",
+      "};"
+    ],
+    "description": "Define a Range prototype method"
+  },
+  "Prototype ListRow Method": {
+    "prefix": "protolistrow", 
+    "body": [
+      "prototype.COM.ListRow ${1:methodName}($2) {",
+      "\tlet headers = this.parent.listcolumns;",
+      "\tlet values = this.range.value2;",
+      "\t${3:// Process row data}",
+      "\treturn ${4:this};",
+      "};"
+    ],
+    "description": "Define a ListRow prototype method for table processing"
+  },
+  "Prototype Worksheet Method": {
+    "prefix": "protoworksheet",
+    "body": [
+      "prototype.COM.Worksheet ${1:methodName}($2) {",
+      "\t${3:// Access worksheet properties via 'this'}",
+      "\t${4:// this.Name, this.Range, this.Cells, etc.}",
+      "\treturn this;",
+      "};"
+    ],
+    "description": "Define a Worksheet prototype method"
+  },
+  "Prototype Document Method": {
+    "prefix": "protodocument",
+    "body": [
+      "prototype.COM.Document ${1:methodName}($2) {",
+      "\t${3:// Access Word document via 'this'}",
+      "\t${4:// this.Range, this.Paragraphs, this.Tables, etc.}",
+      "\treturn this;",
+      "};"
+    ],
+    "description": "Define a Word Document prototype method"
+  },
+  "Prototype Presentation Method": {
+    "prefix": "protopresentation",
+    "body": [
+      "prototype.COM.Presentation ${1:methodName}($2) {",
+      "\t${3:// Access PowerPoint presentation via 'this'}",
+      "\t${4:// this.Slides, this.SlideMaster, this.Name, etc.}",
+      "\treturn this;",
+      "};"
+    ],
+    "description": "Define a PowerPoint Presentation prototype method"
+  },
+  "Prototype Slide Method": {
+    "prefix": "protoslide",
+    "body": [
+      "prototype.COM.Slide ${1:methodName}($2) {",
+      "\t${3:// Access slide properties via 'this'}",
+      "\t${4:// this.Shapes, this.Layout, this.Background, etc.}",
+      "\treturn this;",
+      "};"
+    ],
+    "description": "Define a PowerPoint Slide prototype method"
+  },
+  "Prototype Recordset Method": {
+    "prefix": "protorecordset",
+    "body": [
+      "prototype.COM.Recordset ${1:methodName}($2) {",
+      "\t${3:// Access Access recordset via 'this'}",
+      "\t${4:// this.Fields, this.RecordCount, this.MoveNext, etc.}",
+      "\treturn this;",
+      "};"
+    ],
+    "description": "Define an Access Recordset prototype method"
+  },
+  "Prototype MailItem Method": {
+    "prefix": "protomailitem",
+    "body": [
+      "prototype.COM.MailItem ${1:methodName}($2) {",
+      "\t${3:// Access Outlook mail item via 'this'}",
+      "\t${4:// this.Subject, this.Body, this.Recipients, etc.}",
+      "\treturn this;",
+      "};"
+    ],
+    "description": "Define an Outlook MailItem prototype method"
+  },
+  "This Property Access": {
+    "prefix": "this",
+    "body": "this.${1:property}",
+    "description": "Access COM object property via 'this'"
+  },
   "VBA Escape": {
     "prefix": "vba",
     "body": [
