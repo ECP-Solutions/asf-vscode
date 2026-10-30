@@ -3,6 +3,47 @@
 All notable changes for ASF. This file combines the release notes from the project's releases.
 
 
+## [v1.1.0] - 2026-10-30
+https://github.com/ECP-Solutions/asf-vscode/releases/tag/v1.1.0
+
+## Summary
+
+Language support for every ASF feature up to ASF v3.2.0, and a fix for the language configuration, which v1.0.9 had replaced with a copy of the grammar: comment toggling, bracket matching, auto-closing pairs and indentation rules work again, and the COM prototype grammar is now the one VS Code loads.
+
+## Highlights
+
+- **Fixed**:
+    - `language-configuration.json` holds the language configuration again; the grammar lives only in `syntaxes/asf.tmLanguage.json`.
+    - The `obj` snippet was missing the comma between its two properties; `afun` was described as an arrow function.
+    - Statements inside `switch` cases are checked; `print(...)`, `return (...)` followed by more expression, function literals passed as arguments and braceless bodies no longer report false missing semicolons.
+    - `;` is no longer required before a closing `}` or after the last statement of a script, as in ASF. A missing `;` after a block statement is a warning (the compiler logs one), after any other statement an error.
+    - The invalid `[yourLanguageId]` configuration default and the `files.associations` default are removed; `.asf` is registered as a file extension instead.
+- **Added — syntax highlighting**:
+    - `??`, `^=`, `&=`, `|=`, `<<=`, `>>=`, `&` concatenation, `undefined`, `option base`, `$n` host arguments.
+    - Side-effect imports (`import './lib.vas';`), `export prototype.COM...`, module paths, `export { a as b }`.
+    - Regex strings (`` `/\d+/g` ``, `'/\\d+/g'`) and the patterns passed to `regex()`, `.init()` and `.setPattern()`, with groups, lookarounds, classes, quantifiers, anchors, backreferences and flags.
+    - Class bodies: method names, fields, `static` members; function parameters and rest parameters; `catch` variables; object literal keys; member access (keywords after `.` are properties); built-in functions, `Math` and built-in methods.
+    - `@(...)` with nested parentheses, `${}` with nested braces and templates, quoted strings spanning lines.
+    - `===`, `!==` and `=>` are marked invalid.
+- **Added — IntelliSense**:
+    - Context-aware completions: built-in array, string, object and regex methods (the type is inferred from the variable's initializer), `Math`, class members after `this.` and instances, static methods, namespace import members, COM types after `prototype.COM.`, classes after `new`, exports inside `import { }`, and `.vas` files inside import paths.
+    - Hover documentation for every built-in function, method and `Math` member, keywords, `$n` placeholders, COM types and module paths.
+    - Signature help, Go to Definition (across imported modules), clickable import paths and a folding provider (blocks, comments, imports, regions).
+- **Added — diagnostics**:
+    - Unbalanced brackets; unterminated strings, templates, block comments and `@(...)`.
+    - Quotes and escapes the ASF tokenizer changes: `"` inside `'...'`, `'` inside `"..."`, `"` in templates, dropped backslashes such as `'\d'`.
+    - `;` in `for` headers, `===`/`!==`, arrow functions, `const`/`var`, `function`, `else if`, exponent and hex numbers, invalid `option base`.
+    - Missing relative modules, and imported names the module does not export.
+    - Settings to turn each group off: `asf.diagnostics.enable`, `asf.diagnostics.missingSemicolons`, `asf.diagnostics.stringPitfalls`, `asf.diagnostics.unresolvedImports`.
+- **Updated**:
+    - More than 60 snippets: class members, mixed and side-effect imports, `export fun`, `export prototype`, `option base`, regex, array methods, regions and more. Import snippets use single quotes, as the ASF documentation does.
+    - `test/features.vas` shows every construct the extension supports.
+
+**Full Changelog**: https://github.com/ECP-Solutions/asf-vscode/compare/v1.0.9...v1.1.0
+
+---
+
+
 ## [v1.0.9] - 2026-02-18
 https://github.com/ECP-Solutions/asf-vscode/releases/tag/v1.1.0
 
