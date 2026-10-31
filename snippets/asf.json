@@ -1,33 +1,123 @@
 {
   "Function Declaration": {
     "prefix": "fun",
-    "body": [
-      "fun ${1:name}(${2:params}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "Function declaration"
+    "body": [ "fun ${1:name}(${2:params}) {", "\t$0", "};" ],
+    "description": "Named function declaration"
   },
+  "Anonymous Function": {
+    "prefix": "afun",
+    "body": [ "fun(${1:params}) { ${2:body} }" ],
+    "description": "Anonymous function expression (closure). ASF has no arrow functions"
+  },
+  "Function with Rest Parameter": {
+    "prefix": "funr",
+    "body": [ "fun ${1:name}(${2:first}, ...${3:rest}) {", "\t$0", "};" ],
+    "description": "Function declaration with a rest parameter"
+  },
+  "Return": { "prefix": "ret", "body": [ "return ${1:value};" ], "description": "Return statement" },
+  "Let Declaration": { "prefix": "let", "body": [ "let ${1:name} = ${2:value};" ], "description": "Variable declaration" },
+  "Print": { "prefix": "print", "body": [ "print(${1:message});" ], "description": "Print values to the output" },
   "Object": {
     "prefix": "obj",
+    "body": [ "{", "\t${1:key1}: ${2:value1},", "\t${3:key2}: ${4:value2}", "}" ],
+    "description": "Object literal"
+  },
+  "Object Inline": { "prefix": "objl", "body": [ "{ ${1:key}: ${2:value} }" ], "description": "Single-line object literal" },
+  "Array": { "prefix": "arr", "body": [ "[${1:item1}, ${2:item2}]" ], "description": "Array literal" },
+  "Array Destructuring": {
+    "prefix": "dest",
+    "body": [ "[${1:a}, ${2:b}] = ${3:array};" ],
+    "description": "Array destructuring assignment"
+  },
+  "Array Destructuring with Rest": {
+    "prefix": "destr",
+    "body": [ "[${1:first}, ...${2:rest}] = ${3:array};" ],
+    "description": "Array destructuring with a rest element"
+  },
+  "Spread Array": {
+    "prefix": "spread",
+    "body": [ "[...${1:array1}, ...${2:array2}]" ],
+    "description": "Combine arrays with the spread operator"
+  },
+  "Nullish Coalescing": {
+    "prefix": "nullish",
+    "body": [ "${1:value} ?? ${2:fallback}" ],
+    "description": "Use the right operand when the left one is null or empty"
+  },
+  "Ternary": {
+    "prefix": "tern",
+    "body": [ "(${1:condition}) ? ${2:whenTrue} : ${3:whenFalse}" ],
+    "description": "Ternary conditional expression"
+  },
+  "Template Literal": {
+    "prefix": "tpl",
+    "body": [ "`${${1:expression}}`" ],
+    "description": "Template literal with interpolation"
+  },
+  "If Statement": { "prefix": "if", "body": [ "if (${1:condition}) {", "\t$0", "};" ], "description": "If statement" },
+  "If-Else Statement": {
+    "prefix": "ife",
+    "body": [ "if (${1:condition}) {", "\t$2", "} else {", "\t$0", "};" ],
+    "description": "If-else statement"
+  },
+  "If-ElseIf-Else Statement": {
+    "prefix": "ifel",
+    "body": [ "if (${1:condition}) {", "\t$2", "} elseif (${3:condition}) {", "\t$4", "} else {", "\t$0", "};" ],
+    "description": "If-elseif-else statement"
+  },
+  "For Loop (C-style)": {
+    "prefix": "for",
+    "body": [ "for (let ${1:i} = ${2:1}, ${1:i} <= ${3:n}, ${1:i} += 1) {", "\t$0", "};" ],
+    "description": "C-style for loop. ASF separates the three clauses with ',' and arrays are 1-based by default"
+  },
+  "For-In Loop": {
+    "prefix": "forin",
+    "body": [ "for (let ${1:key} in ${2:object}) {", "\t$0", "};" ],
+    "description": "Iterate over the keys of an object or the indices of an array or string"
+  },
+  "For-Of Loop": {
+    "prefix": "forof",
+    "body": [ "for (let ${1:item} of ${2:array}) {", "\t$0", "};" ],
+    "description": "Iterate over the values of an array, object or string"
+  },
+  "While Loop": { "prefix": "while", "body": [ "while (${1:condition}) {", "\t$0", "};" ], "description": "While loop" },
+  "Switch Statement": {
+    "prefix": "switch",
     "body": [
-      "{",
-      "\t${1:key1}: ${2:value1}",
-      "\t${3:key2}: ${4:value2}",
+      "switch (${1:expression}) {",
+      "\tcase ${2:value} {",
+      "\t\t$3",
+      "\t}",
+      "\tdefault {",
+      "\t\t$0",
+      "\t}",
       "};"
     ],
-    "description": "Object Literal"
+    "description": "Switch statement. Cases do not fall through, so no break is needed"
+  },
+  "Case Clause": { "prefix": "case", "body": [ "case ${1:value} {", "\t$0", "}" ], "description": "Switch case clause" },
+  "Try-Catch": {
+    "prefix": "try",
+    "body": [ "try {", "\t$1", "} catch (${2:error}) {", "\t$0", "};" ],
+    "description": "Try-catch block with an error variable"
+  },
+  "Try-Catch without Variable": {
+    "prefix": "tryc",
+    "body": [ "try {", "\t$1", "} catch {", "\t$0", "};" ],
+    "description": "Try-catch block without an error variable"
   },
   "Class Declaration": {
     "prefix": "class",
     "body": [
       "class ${1:ClassName} {",
-      "\tconstructor(${2:params}) {",
+      "\tfield ${2:name};",
+      "",
+      "\tconstructor(${3:params}) {",
       "\t\t$0",
       "\t}",
       "};"
     ],
-    "description": "Class declaration"
+    "description": "Class declaration with a field and a constructor"
   },
   "Class with Extends": {
     "prefix": "classx",
@@ -39,196 +129,107 @@
       "\t}",
       "};"
     ],
-    "description": "Class declaration with extends"
+    "description": "Class that extends a parent class"
   },
-  "If Statement": {
-    "prefix": "if",
-    "body": [
-      "if (${1:condition}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "If statement"
+  "Class Field": { "prefix": "field", "body": [ "field ${1:name} = ${2:value};" ], "description": "Class field declaration" },
+  "Class Method": {
+    "prefix": "method",
+    "body": [ "${1:methodName}(${2:params}) {", "\t$0", "}" ],
+    "description": "Class method"
   },
-  "If-Else Statement": {
-    "prefix": "ife",
-    "body": [
-      "if (${1:condition}) {",
-      "\t$2",
-      "} else {",
-      "\t$0",
-      "};"
-    ],
-    "description": "If-else statement"
+  "Static Method": {
+    "prefix": "static",
+    "body": [ "static ${1:methodName}(${2:params}) {", "\t$0", "}" ],
+    "description": "Static class method"
   },
-  "If-ElseIf-Else Statement": {
-    "prefix": "ifel",
-    "body": [
-      "if (${1:condition}) {",
-      "\t$2",
-      "} elseif (${3:condition}) {",
-      "\t$4",
-      "} else {",
-      "\t$0",
-      "};"
-    ],
-    "description": "If-elseif-else statement"
+  "Constructor": {
+    "prefix": "ctor",
+    "body": [ "constructor(${1:params}) {", "\t$0", "}" ],
+    "description": "Class constructor"
   },
-  "For Loop (C-style)": {
-    "prefix": "for",
-    "body": [
-      "for (${1:i = 0}, ${2:i < n}, ${3:i = i + 1}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "C-style for loop"
-  },
-  "For-In Loop": {
-    "prefix": "forin",
-    "body": [
-      "for (${1:key} in ${2:object}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "For-in object loop"
-  },
-  "For-In array": {
-    "prefix": "forin",
-    "body": [
-      "for (${1:key} in ${2:array}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "For-in array loop"
-  },
-  "For-Of Loop": {
-    "prefix": "forof",
-    "body": [
-      "for (${1:item} of ${2:array}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "For-of array loop"
-  },
-  "For-Of object": {
-    "prefix": "forof",
-    "body": [
-      "for (${1:item} of ${2:object}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "For-of object loop"
-  },
-  "While Loop": {
-    "prefix": "while",
-    "body": [
-      "while (${1:condition}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "While loop"
-  },
-  "Switch Statement": {
-    "prefix": "switch",
-    "body": [
-      "switch (${1:expression}) {",
-      "\tcase ${2:value}{",
-      "\t\t$3",
-      "\t}",
-      "\tdefault{",
-      "\t\t$0",
-      "\t}",
-      "};"
-    ],
-    "description": "Switch statement"
-  },
-  "Try-Catch": {
-    "prefix": "try",
-    "body": [
-      "try {",
-      "\t$1",
-      "} catch (${2:error}) {",
-      "\t$0",
-      "};"
-    ],
-    "description": "Try-catch block"
-  },
+  "New Instance": { "prefix": "new", "body": [ "new ${1:ClassName}(${2:args})" ], "description": "Create a class instance" },
   "Import Default": {
     "prefix": "imp",
-    "body": [
-      "import ${1:name} from \"${2:module}\";"
-    ],
-    "description": "Import default"
+    "body": [ "import ${1:name} from './${2:module}.vas';" ],
+    "description": "Import the default export of a module"
   },
   "Import Named": {
     "prefix": "impn",
-    "body": [
-      "import { ${1:name} } from \"${2:module}\";"
-    ],
-    "description": "Import named"
+    "body": [ "import { ${1:name} } from './${2:module}.vas';" ],
+    "description": "Import named exports of a module"
   },
   "Import Namespace": {
     "prefix": "impns",
-    "body": [
-      "import * as ${1:name} from \"${2:module}\";"
-    ],
-    "description": "Import namespace"
+    "body": [ "import * as ${1:name} from './${2:module}.vas';" ],
+    "description": "Import every export of a module as a namespace object"
   },
-  "Export Named": {
-    "prefix": "exp",
-    "body": [
-      "export { ${1:name}, ${2:name2} };"
-    ],
-    "description": "Export named"
+  "Import Mixed": {
+    "prefix": "impm",
+    "body": [ "import ${1:defaultName}, { ${2:name} } from './${3:module}.vas';" ],
+    "description": "Import the default export and named exports"
   },
-  "Export Default": {
-    "prefix": "expd",
-    "body": [
-      "export default ${1:value};"
-    ],
-    "description": "Export default"
+  "Import Side Effects": {
+    "prefix": "imps",
+    "body": [ "import './${1:module}.vas';" ],
+    "description": "Run a module for its side effects, such as registering a prototype library"
   },
-  "Array Destructuring": {
-    "prefix": "dest",
-    "body": [
-      "[${1:a}, ${2:b}] = ${3:array};"
-    ],
-    "description": "Array destructuring"
+  "Module Header": {
+    "prefix": "module",
+    "body": [ "scwd(${1:wd});", "import { ${2:name} } from './${3:module}.vas';" ],
+    "description": "Set the working directory, then import from a relative path"
   },
-  "Array Destructuring with Rest": {
-    "prefix": "destr",
-    "body": [
-      "[${1:first}, ...${2:rest}] = ${3:array};"
-    ],
-    "description": "Array destructuring with rest"
+  "Export Named": { "prefix": "exp", "body": [ "export { ${1:name}, ${2:name2} };" ], "description": "Export named items" },
+  "Export Default": { "prefix": "expd", "body": [ "export default ${1:value};" ], "description": "Export a default value" },
+  "Export Function": {
+    "prefix": "expf",
+    "body": [ "export fun ${1:name}(${2:params}) {", "\t$0", "};" ],
+    "description": "Declare and export a function"
   },
-  "Print": {
-    "prefix": "print",
-    "body": [
-      "print(${1:message});"
-    ],
-    "description": "Print statement"
+  "Export Prototype": {
+    "prefix": "expp",
+    "body": [ "export prototype.COM.${1:Range} ${2:methodName}(${3:params}) {", "\t$0", "};" ],
+    "description": "Declare and export a COM prototype method. It is exported as <ObjectType>_<methodName>"
   },
-  "Let Declaration": {
-    "prefix": "let",
-    "body": [
-      "let ${1:name} = ${2:value};"
-    ],
-    "description": "Let declaration"
+  "Option Base": {
+    "prefix": "option",
+    "body": [ "option base ${1|1,0|};" ],
+    "description": "Set the array index base (experimental)"
   },
-  "Arrow Function": {
-    "prefix": "afun",
-    "body": [
-      "fun(${1:params}) { ${2:body} };"
-    ],
-    "description": "Anonymous function"
+  "Regex Object": {
+    "prefix": "regex",
+    "body": [ "let ${1:re} = regex(`${2:pattern}`${3:, true});" ],
+    "description": "Create a regex engine (pattern, ignoreCase, multiline, dotAll)"
   },
-  "Template Literal": {
-    "prefix": "tpl",
-    "body": [
-      "`${${1:expression}}`"
-    ],
-    "description": "Template literal"
+  "Regex Literal": {
+    "prefix": "rel",
+    "body": [ "`/${1:pattern}/${2:g}`" ],
+    "description": "Regex literal string for match, matchAll, replace, replaceAll and split"
+  },
+  "Map": {
+    "prefix": "map",
+    "body": [ "${1:array}.map(fun(${2:item}) {", "\treturn $0;", "})" ],
+    "description": "Transform each element"
+  },
+  "Filter": {
+    "prefix": "filter",
+    "body": [ "${1:array}.filter(fun(${2:item}) {", "\treturn $0;", "})" ],
+    "description": "Keep the elements that pass a test"
+  },
+  "Reduce": {
+    "prefix": "reduce",
+    "body": [ "${1:array}.reduce(fun(${2:acc}, ${3:item}) {", "\treturn $0;", "}, ${4:0})" ],
+    "description": "Reduce to a single value"
+  },
+  "For Each": {
+    "prefix": "foreach",
+    "body": [ "${1:array}.forEach(fun(${2:item}, ${3:index}) {", "\t$0", "});" ],
+    "description": "Run a function for each element"
+  },
+  "VBA Expression": { "prefix": "vba", "body": [ "@(${1:VBA_EXPR})" ], "description": "Evaluate a block with VBA-Expressions" },
+  "Region": {
+    "prefix": "region",
+    "body": [ "// #region ${1:name}", "$0", "// #endregion" ],
+    "description": "Foldable region"
   },
   "Prototype Method Definition": {
     "prefix": "prototype",
@@ -253,7 +254,7 @@
     "description": "Define a Range prototype method"
   },
   "Prototype ListRow Method": {
-    "prefix": "protolistrow", 
+    "prefix": "protolistrow",
     "body": [
       "prototype.COM.ListRow ${1:methodName}($2) {",
       "\tlet headers = this.parent.listcolumns;",
@@ -330,16 +331,5 @@
     ],
     "description": "Define an Outlook MailItem prototype method"
   },
-  "This Property Access": {
-    "prefix": "this",
-    "body": "this.${1:property}",
-    "description": "Access COM object property via 'this'"
-  },
-  "VBA Escape": {
-    "prefix": "vba",
-    "body": [
-      "@(${1:VBA_CODE})"
-    ],
-    "description": "VBA escape hatch"
-  }
+  "This Property Access": { "prefix": "this", "body": "this.${1:property}", "description": "Access COM object property via 'this'" }
 }

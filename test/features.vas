@@ -1,0 +1,158 @@
+// ASF language feature tour: every construct the extension highlights,
+// completes, documents and validates. Open it in VS Code to check the extension.
+# Python-style comments are comments too
+/* Block
+   comment */
+
+// #region Module system
+scwd(wd);
+import { add, multiply as times, PI } from './math.vas';
+import Calculator from './calculator.vas';
+import * as utils from './utils.vas';
+import mainFunc, { helper, VERSION } from './lib.vas';
+import './prototypes.vas';
+// #endregion
+
+option base 1;
+
+// Variables, literals and operators
+let count = 10;
+total = 3.14159;
+let name = 'Alice';
+let quoted = "double quotes";
+let escaped = 'It\'s a \\ path\n\t\r';
+let multi = 'quoted strings
+can span lines';
+let nothing = null;
+let missing = undefined;
+let flags = [true, false];
+let arg = $1.sheets(1).range('A1').value2;
+let label = user.name ?? user.id ?? 'anonymous';
+let status = (count >= 18) ? 'adult' : 'minor';
+count += 5; count -= 3; count *= 2; count /= 4; count %= 4;
+count ^= 3; count &= 7; count |= 2; count <<= 2; count >>= 1;
+let mix = (count << 1) + (count >> 1) - count * 2 / 3 % 4 ^ 2;
+let logic = !(count == 1) && (count != 2) || (count <= 3) && (count < 4) || count > 5;
+let text = 'Count' & ': ' & count;
+let kind = typeof count;
+
+// Template literals, nested templates and regex strings
+let greeting = `Hello, ${name}! You have ${count + 1} messages`;
+let nested = `User ${user.name} (${user.role == 'admin' ? 'Administrator' : 'User'})`;
+let withObj = `Size: ${ { a: 1, b: 2 }.size() }`;
+let digits = 'phone 555-1234'.match(`/(\d{3})-(\d{4})/g`);
+let named = 'x'.replace(`/(?<word>\w+)\s*(?=\k<word>)/gi`, '$<word>');
+let quotedRe = 'a1b2'.replaceAll('/\\d+/g', '#');
+let re = regex(`^[\w.]+@\w+\.\w+$`, true);
+re.init(`(a|b)+?c*`, true, false, true);
+re.setPattern(`[^\s,;]{2,5}`);
+print(re.test('user@example.com'), re.exec('abc'), re.execAll('aa'), regex().escape('a.b*c?'));
+
+// VBA expressions with nested parentheses
+let matrix = @(MROUND(LUDECOMP(ARRAY({1;0;4};{1;1;6};{-3;0;-10}));4));
+
+// Arrays, objects, spread, rest and destructuring
+let numbers = [1, 2, 3, 4, 5];
+let person = { name: 'John', age: 30, address: { city: 'Boston' } };
+let merged = { ...person, active: true };
+let combined = [0, ...numbers, 6];
+[first, second] = numbers;
+[head, ...tail] = numbers;
+print(numbers.length, person.keys(), person.get('age', 0), numbers.map(fun(x) { return x * 2; }));
+print(Math.PI, Math.E, Math.floor(Math.sqrt(16)), Math.max(1, 2, 3));
+print(range(1, 6), flatten([1, [2, [3]]], 1), clone(person), isArray(numbers), isNumeric('42'));
+foreach(numbers, fun(val, idx, arr) { print(idx, val); });
+
+// Functions, closures and rest parameters
+fun greetAll(greeting, ...names) {
+    let result = greeting + ': ';
+    for (let n of names) {
+        result = result + n + ', ';
+    };
+    return result.slice(0, -2);
+};
+let square = fun(x) { return x * x; };
+fun makeCounter() {
+    let c = 0;
+    return fun() { c += 1; return c; };
+};
+
+// Control flow
+if (count > 20) {
+    print('big');
+} elseif (count > 10) {
+    print('medium');
+} else {
+    print('small');
+};
+for (let i = 1, i <= 5, i += 1) {
+    if (i == 2) { continue; };
+    if (i == 4) { break; };
+};
+for (let key in person) { print(key); };
+let k = 0;
+while (k < 3) { k += 1; };
+switch (count) {
+    case 1 {
+        print('one');
+    }
+    case 2 {
+        print('two');
+    }
+    default {
+        print('other');
+    };
+};
+try {
+    riskyOperation();
+} catch (e) {
+    print('Failed: ' + e);
+};
+try { riskyOperation(); } catch { print('failed'); };
+
+// Classes
+class Animal {
+    field name, species = 'unknown';
+    constructor(name, species) {
+        this.name = name;
+        this.species = species;
+    }
+    speak() {
+        print(this.name + ' makes a sound');
+    }
+    static create(name) {
+        return new Animal(name, 'generic');
+    }
+};
+class Dog extends Animal {
+    field breed;
+    constructor(name, breed) {
+        super(name, 'Dog');
+        this.breed = breed;
+    }
+    speak() {
+        print(this.name + ' barks!');
+    }
+};
+let dog = new Dog('Rex', 'Labrador');
+dog.speak();
+
+// COM prototype extension
+prototype.COM.Range formatCurrency() {
+    this.NumberFormat = '$#,##0.00';
+    this.Font.Bold = true;
+    return this;
+};
+export prototype.COM.Worksheet highlight(rng, color) {
+    rng.Interior.Color = color;
+};
+$1.Range('B2:B10').formatCurrency();
+
+// Exports
+export fun processData(data) {
+    return data.map(fun(x) { return x * 2; });
+};
+export { greetAll, square as sq };
+export default Animal;
+
+return `${name}: ${count}`

@@ -2,7 +2,7 @@
   "name": "asf-language",
   "displayName": "VBA Advanced Scripting Syntax",
   "description": "Advanced Scripting Framework language support for VS Code",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "publisher": "ECPSolutions",
   "icon": "icons/asf-icon.png",
   "browser": "./extension.js",
@@ -11,20 +11,24 @@
     "vscode": "^1.80.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "ASF",
+    "VBA",
+    "Advanced Scripting Framework",
+    "vas",
+    "Office",
+    "Excel"
   ],
   "main": "./extension.js",
   "contributes": {
     "languages": [{
       "id": "asf",
       "aliases": ["ASF", "Advanced Scripting Framework"],
-      "extensions": [".vas"],
+      "extensions": [".vas", ".asf"],
       "configuration": "./language-configuration.json",
-      "configurationDefaults": {
-          "[yourLanguageId]": {
-            "editor.foldingStrategy": "indentation"
-          }
-       },
       "icon": {
           "light": "./icons/asf-icon.png",
           "dark": "./icons/asf-icon.png"
@@ -33,7 +37,10 @@
     "grammars": [{
       "language": "asf",
       "scopeName": "source.asf",
-      "path": "./syntaxes/asf.tmLanguage.json"
+      "path": "./syntaxes/asf.tmLanguage.json",
+      "tokenTypes": {
+        "meta.template.expression.asf": "other"
+      }
     }],
     "snippets": [
       {
@@ -41,14 +48,35 @@
         "path": "./snippets/asf.json"
       }
     ],
+    "configuration": {
+      "title": "ASF",
+      "properties": {
+        "asf.diagnostics.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check ASF files for errors while you type."
+        },
+        "asf.diagnostics.missingSemicolons": {
+          "type": "boolean",
+          "default": true,
+          "description": "Report statements, including block statements such as if, for and fun, that are not terminated by ';'."
+        },
+        "asf.diagnostics.stringPitfalls": {
+          "type": "boolean",
+          "default": true,
+          "description": "Warn about string contents the ASF tokenizer changes: quotes that end the string early (ASF turns every \" into ') and backslash escapes it drops."
+        },
+        "asf.diagnostics.unresolvedImports": {
+          "type": "boolean",
+          "default": true,
+          "description": "Warn when a relative import path ('./' or '../') does not exist next to the current file, or when an imported name is not exported by that module."
+        }
+      }
+    },
     "configurationDefaults": {
       "[asf]": {
         "editor.tabSize": 4,
         "editor.insertSpaces": true
-      },
-      "files.associations": {
-        "*.asf": "asf",
-        "*.vas": "asf"
       }
     }
   },
@@ -60,4 +88,3 @@
     "@types/vscode": "^1.80.0"
   }
 }
-
