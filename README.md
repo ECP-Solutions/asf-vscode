@@ -26,6 +26,7 @@ Full TextMate grammar covering every construct in the ASF language (up to ASF v3
 - JavaScript syntax that ASF does not have (`===`, `!==`, `=>`) is marked as invalid
 
 ![ASF](/assets/ASF.png)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FECP-Solutions%2Fasf-vscode.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FECP-Solutions%2Fasf-vscode?ref=badge_shield)
 
 ### IntelliSense
 
@@ -164,3 +165,7 @@ See the [ASF documentation](https://ecp-solutions.github.io/ASF/) for setup inst
 - [VS Code Extension API](https://code.visualstudio.com/api)
 
 **Enjoy!**
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FECP-Solutions%2Fasf-vscode.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FECP-Solutions%2Fasf-vscode?ref=badge_large)
